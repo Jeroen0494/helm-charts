@@ -367,20 +367,23 @@ controller:
 
 ### Global
 
-| Name                | Description                                                   | Value    |
-| ------------------- | ------------------------------------------------------------- | -------- |
-| `container_runtime` | [string] for raw logs format: json or cri (docker|containerd) | `docker` |
+| Name                | Description                                        | Value    |
+| ------------------- | -------------------------------------------------- | -------- |
+| `container_runtime` | [string] for raw logs format: docker or containerd | `docker` |
 
 ### Image
 
-| Name                | Description                                               | Value                    |
-| ------------------- | --------------------------------------------------------- | ------------------------ |
-| `image.repository`  | [string] docker image repository name                     | `crowdsecurity/crowdsec` |
-| `image.pullPolicy`  | [string] Image pull policy (Always, IfNotPresent, Never)  | `IfNotPresent`           |
-| `image.pullSecrets` | Image pull secrets (array of objects with a 'name' field) | `[]`                     |
-| `image.tag`         | docker image tag (empty defaults to chart AppVersion)     | `""`                     |
-| `podAnnotations`    | podAnnotations to be added to pods (string:string map)    | `{}`                     |
-| `podLabels`         | Labels to be added to pods (string:string map)            | `{}`                     |
+| Name                       | Description                                                                                                        | Value                    |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| `image.repository`         | [string] docker image repository name                                                                              | `crowdsecurity/crowdsec` |
+| `image.pullPolicy`         | [string] Image pull policy (Always, IfNotPresent, Never)                                                           | `IfNotPresent`           |
+| `image.pullSecrets`        | Image pull secrets (array of objects with a 'name' field)                                                          | `[]`                     |
+| `image.tag`                | docker image tag (empty defaults to chart AppVersion)                                                              | `""`                     |
+| `image.kubectl.repository` | [string] kubectl image repository used by registration jobs initContainers                                         | `alpine/kubectl`         |
+| `image.kubectl.tag`        | [string] kubectl image tag (override to match your cluster version if you encounter issues with registration jobs) | `latest`                 |
+| `image.kubectl.pullPolicy` | [string] kubectl image pull policy (Always, IfNotPresent, Never)                                                   | `IfNotPresent`           |
+| `podAnnotations`           | podAnnotations to be added to pods (string:string map)                                                             | `{}`                     |
+| `podLabels`                | Labels to be added to pods (string:string map)                                                                     | `{}`                     |
 
 ### Configuration
 
@@ -450,6 +453,8 @@ controller:
 | `lapi.extraInitContainers`                      | Additional init containers for LAPI pods                                                                                  | `[]`                |
 | `lapi.extraVolumes`                             | Additional volumes for LAPI pods                                                                                          | `[]`                |
 | `lapi.extraVolumeMounts`                        | Additional volumeMounts for LAPI pods                                                                                     | `[]`                |
+| `lapi.podSecurityContext`                       | Security context for LAPI pods                                                                                            | `{}`                |
+| `lapi.securityContext`                          | Security context for the LAPI contaienr                                                                                   | `{}`                |
 | `lapi.resources`                                | Resource requests and limits for the LAPI pods                                                                            | `{}`                |
 | `lapi.persistentVolume.data.enabled`            | Enable persistent volume for the data folder (stores bouncer API keys)                                                    | `true`              |
 | `lapi.persistentVolume.data.accessModes`        | Access modes for the data PVC                                                                                             | `["ReadWriteOnce"]` |
@@ -512,6 +517,8 @@ controller:
 | `agent.extraInitContainers`                      | Extra init containers for agent pods                                                       | `[]`    |
 | `agent.extraVolumes`                             | Extra volumes for agent pods                                                               | `[]`    |
 | `agent.extraVolumeMounts`                        | Extra volume mounts for agent pods                                                         | `[]`    |
+| `agent.podSecurityContext`                       | Security context for agent pods                                                            | `{}`    |
+| `agent.securityContext`                          | Security context for agent containers                                                      | `{}`    |
 | `agent.resources`                                | Resource requests and limits for agent pods                                                | `{}`    |
 | `agent.persistentVolume.config.enabled`          | [object] Enable persistent volume for agent config                                         | `false` |
 | `agent.persistentVolume.config.accessModes`      | Access modes for the config PVC                                                            | `[]`    |
@@ -543,6 +550,7 @@ controller:
 | `agent.wait_for_lapi.image.repository`           | Repository for the wait-for-lapi init container image                                      | `""`    |
 | `agent.wait_for_lapi.image.pullPolicy`           | Image pull policy for the wait-for-lapi init container                                     | `""`    |
 | `agent.wait_for_lapi.image.tag`                  | Image tag for the wait-for-lapi init container                                             | `""`    |
+| `agent.wait_for_lapi.securityContext`            | Security context for the wait-for-lapi init container                                      | `{}`    |
 | `appsec.enabled`                                 | [object] Enable AppSec component (disabled by default)                                     | `false` |
 | `appsec.lapiURL`                                 | URL the AppSec component uses to reach LAPI (defaults to internal service URL)             | `""`    |
 | `appsec.lapiHost`                                | Hostname the AppSec component uses to reach LAPI                                           | `""`    |
@@ -559,6 +567,8 @@ controller:
 | `appsec.extraInitContainers`                     | Extra init containers for AppSec pods                                                      | `[]`    |
 | `appsec.extraVolumes`                            | Extra volumes for AppSec pods                                                              | `[]`    |
 | `appsec.extraVolumeMounts`                       | Extra volume mounts for AppSec pods                                                        | `[]`    |
+| `appsec.podSecurityContext`                      | Security context for AppSec pods                                                           | `{}`    |
+| `appsec.securityContext`                         | Security context for the appsec container                                                  | `{}`    |
 | `appsec.resources`                               | Resource requests and limits for AppSec pods                                               | `{}`    |
 | `appsec.env`                                     | Environment variables for the AppSec container (collections/configs/rules toggles, etc.)   | `[]`    |
 | `appsec.nodeSelector`                            | Node selector for scheduling AppSec pods                                                   | `{}`    |
@@ -582,3 +592,4 @@ controller:
 | `appsec.wait_for_lapi.image.repository`          | Repository for the wait-for-lapi init con                                                  | `""`    |
 | `appsec.wait_for_lapi.image.pullPolicy`          | Image pull policy for the wait-for-lapi init container                                     | `""`    |
 | `appsec.wait_for_lapi.image.tag`                 | Image tag for the wait-for-lapi init container                                             | `1.28`  |
+| `appsec.wait_for_lapi.securityContext`           | Security context for the wait-for-lapi init container                                      | `{}`    |
